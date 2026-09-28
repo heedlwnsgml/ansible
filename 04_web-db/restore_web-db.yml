@@ -1,0 +1,62 @@
+---
+# (ㄱ) 방화벽 포트 제거 - http, https, mysql
+# (ㄴ) 서비스 종료 - httpd, mysql
+# (ㄷ) 서비스 설정 삭제 - /var/www/html/index.php
+# (ㄹ) 패키지 삭제
+#           - httpd
+#           - mod_ssl
+#           - php
+#           - php-mysqlnd
+#           - php-pdo
+#           - mariadb
+#           - mariadb-server
+#           - python3-PyMySQL
+#           - mariadb-connector-c-config
+#           - mariadb-common
+#           - mariadb-connector-c
+#           - mariadb-errmsg
+
+- name: 리스토어
+  hosts: all
+  tasks:
+    - name: (ㄱ) 방화벽 포트 제거
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        state: disabled
+        permanent: true
+        immediate: true
+      loop:
+        - http
+        - https
+        - mysql
+    
+    - name: (ㄴ) 서비스 종료
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+          - httpd
+          - mysql
+    
+    - name: (ㄷ) 서비스 설정 삭제
+      ansible.builtin.file:
+       path: /var/www/html/index.php
+       state: absent  
+    
+    - name: (ㄹ) 패키지 삭제
+      ansible.builtin.dnf:
+        name: 
+          - httpd
+          - mod_ssl
+          - php
+          - php-mysqlnd
+          - php-pdo
+          - mariadb
+          - mariadb-server
+          - python3-PyMySQL
+          - mariadb-connector-c-config
+          - mariadb-common
+          - mariadb-connector-c
+          - mariadb-errmsg
+        state: absent

@@ -1,0 +1,45 @@
+---
+
+  - name: Restore site.yml
+    hosts: webservers
+    tasks: 
+
+      - name: 서비스 상태 수집
+        ansible.builtin.service_facts:
+
+      - name: 1) 방화벽 포트 제거 - firewalld(http)
+        ansible.posix.firewalld:
+          service: http
+          state: disabled
+          permanent: true
+          immediate: true
+      - name: 2. 웹 서비스 stop - systemd(httpd)
+        ansible.builtin.service:
+          name: httpd
+          state: stopped
+          enabled: false
+        when: "'httpd.service' in ansible_facts.services"
+
+      - name: 3. /var/www/html/index.html - file
+        ansible.builtin.file:
+          path: /var/www/html/index.html
+          state: absent
+
+      - name: 4. 패키지 삭제 - dnf/yum
+        ansible.builtin.dnf:
+          name: httpd
+          state: absent
+####################################
+# * 방화벽 포트 제거
+# * 웹 서비스 stop
+# * /var/www/html/index.html 파일 제거
+# * httpd 패키지제거
+####################################
+
+
+
+# 1. 패키지 설치
+# 2. 서비스 설정
+# 3. 서비스 기동
+# 4. 방화벽 기동 및 등록
+# 5. selinux

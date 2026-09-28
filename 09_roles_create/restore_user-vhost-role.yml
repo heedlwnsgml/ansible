@@ -1,0 +1,12 @@
+---
+- name: Restore use-vhost-relo.yml
+  hosts: all
+  tasks:
+    - name: Restore tasks
+      ansible.builtin.include_role:
+        name: rollbacksvc
+      vars:
+        myfiles:
+          - /var/www/html/index.html
+          - /etc/httpd/conf.d/vhost.conf
+          - /var/www/vhosts
