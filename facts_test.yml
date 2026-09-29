@@ -1,0 +1,7 @@
+---
+- name: 확인용
+  hosts: localhost
+  tasks:
+    - name: 확인용
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts['devices']['nvme0n1']['partitions']['nvme0n1p2']['size'] }}"
